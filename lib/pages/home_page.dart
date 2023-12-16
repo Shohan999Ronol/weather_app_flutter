@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
 import 'package:weather_app/consts.dart';
+import 'dart:ui';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -14,11 +15,16 @@ class _HomePageState extends State<HomePage> {
   final WeatherFactory _wf = WeatherFactory(OPENWEATHER_API_KEY);
 
   Weather? _weather;
+  final TextEditingController _cityController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _wf.currentWeatherByCityName("Mumbai").then((w) {
+    _getWeather("Mumbai");
+  }
+
+  void _getWeather(String cityName) {
+    _wf.currentWeatherByCityName(cityName).then((w) {
       setState(() {
         _weather = w;
       });
@@ -28,7 +34,39 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildUI(),
+      body: Stack(
+        children: [
+          // Background Image with Blur
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/vt1.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+            child: Container(
+              color: Colors.black.withOpacity(0),
+            ),
+          ),
+          // UI Components
+          _buildUI(),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showSearchDialog(context);
+        },
+        backgroundColor: Colors.transparent,
+        child: Image.asset(
+          'assets/search.png', // Replace with your search icon image
+          width: 24,
+          height: 24,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }
 
@@ -38,32 +76,34 @@ class _HomePageState extends State<HomePage> {
         child: CircularProgressIndicator(),
       );
     }
-    return SizedBox(
-      width: MediaQuery.sizeOf(context).width,
-      height: MediaQuery.sizeOf(context).height,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _locationHeader(),
-          SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.08,
-          ),
-          _dateTimeInfo(),
-          SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.05,
-          ),
-          _weatherIcon(),
-          SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.02,
-          ),
-          _currentTemp(),
-          SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.02,
-          ),
-          _extraInfo(),
-        ],
+    return SingleChildScrollView(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _locationHeader(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.08,
+            ),
+            _dateTimeInfo(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.05,
+            ),
+            _weatherIcon(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.02,
+            ),
+            _currentTemp(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.02,
+            ),
+            _extraInfo(),
+          ],
+        ),
       ),
     );
   }
@@ -103,7 +143,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Text(
-              "  ${DateFormat("d.m.y").format(now)}",
+              "  ${DateFormat("d.M.y").format(now)}",
               style: const TextStyle(
                 fontWeight: FontWeight.w400,
               ),
@@ -121,7 +161,7 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          height: MediaQuery.sizeOf(context).height * 0.20,
+          height: MediaQuery.of(context).size.height * 0.20,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
@@ -144,7 +184,7 @@ class _HomePageState extends State<HomePage> {
     return Text(
       "${_weather?.temperature?.celsius?.toStringAsFixed(0)}° C",
       style: const TextStyle(
-        color: Colors.black,
+        color: Colors.white70,
         fontSize: 90,
         fontWeight: FontWeight.w500,
       ),
@@ -153,10 +193,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget _extraInfo() {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.15,
-      width: MediaQuery.sizeOf(context).width * 0.80,
+      height: MediaQuery.of(context).size.height * 0.15,
+      width: MediaQuery.of(context).size.width * 0.80,
       decoration: BoxDecoration(
-        color: Colors.deepPurpleAccent,
+        color: Colors.white24,
         borderRadius: BorderRadius.circular(
           20,
         ),
@@ -176,14 +216,14 @@ class _HomePageState extends State<HomePage> {
               Text(
                 "Max: ${_weather?.tempMax?.celsius?.toStringAsFixed(0)}° C",
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 15,
                 ),
               ),
               Text(
                 "Min: ${_weather?.tempMin?.celsius?.toStringAsFixed(0)}° C",
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 15,
                 ),
               )
@@ -197,14 +237,14 @@ class _HomePageState extends State<HomePage> {
               Text(
                 "Wind: ${_weather?.windSpeed?.toStringAsFixed(0)}m/s",
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 15,
                 ),
               ),
               Text(
                 "Humidity: ${_weather?.humidity?.toStringAsFixed(0)}%",
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 15,
                 ),
               )
@@ -214,4 +254,40 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  void _showSearchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Search City'),
+          content: TextField(
+            controller: _cityController,
+            decoration: const InputDecoration(
+              hintText: 'Enter city name',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String cityName = _cityController.text.trim();
+                if (cityName.isNotEmpty) {
+                  _getWeather(cityName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Search'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+
