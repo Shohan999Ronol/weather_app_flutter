@@ -213,6 +213,44 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Wind Icon
+              Image.asset(
+                'assets/wind_speed.png',
+                width: 20,
+                height: 20,
+              ),
+              Text(
+                "Wind: ${_weather?.windSpeed?.toStringAsFixed(0)}m/s",
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                ),
+              ),
+
+              // Humidity Icon
+              Image.asset(
+                'assets/humidity.png',
+                width: 20,
+                height: 20,
+              ),
+              Text(
+                "Humidity: ${_weather?.humidity?.toStringAsFixed(0)}%",
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+
+          // Add a SizedBox for spacing
+          const SizedBox(height: 8),
+
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Text(
                 "Max: ${_weather?.tempMax?.celsius?.toStringAsFixed(0)}° C",
                 style: const TextStyle(
@@ -226,34 +264,14 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.black,
                   fontSize: 15,
                 ),
-              )
+              ),
             ],
           ),
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                "Wind: ${_weather?.windSpeed?.toStringAsFixed(0)}m/s",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                ),
-              ),
-              Text(
-                "Humidity: ${_weather?.humidity?.toStringAsFixed(0)}%",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                ),
-              )
-            ],
-          )
         ],
       ),
     );
   }
+
 
   void _showSearchDialog(BuildContext context) {
     showDialog(
