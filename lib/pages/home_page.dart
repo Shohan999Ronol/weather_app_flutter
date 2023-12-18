@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _getWeather("Mumbai");
+    _getWeather("Sydney");
   }
 
   void _getWeather(String cityName) {
