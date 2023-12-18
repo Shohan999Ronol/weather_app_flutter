@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
-import 'package:weather_app/consts.dart';
 import 'dart:ui';
 
 class HomePage extends StatefulWidget {
@@ -12,7 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final WeatherFactory _wf = WeatherFactory(OPENWEATHER_API_KEY);
+  final WeatherFactory _wf = WeatherFactory('90dfe8c16d20d81a6b365f55111568ea');
 
   Weather? _weather;
   final TextEditingController _cityController = TextEditingController();
