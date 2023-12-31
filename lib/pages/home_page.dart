@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
 import 'dart:ui';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:weather_app/pages/next_five_days_weather.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key});
@@ -19,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _getWeather("Sydney");
+    _getWeather("Dhaka");
   }
 
   void _getWeather(String cityName) {
@@ -54,18 +58,34 @@ class _HomePageState extends State<HomePage> {
           _buildUI(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showSearchDialog(context);
-        },
-        backgroundColor: Colors.transparent,
-        child: Image.asset(
-          'assets/search.png', // Replace with your search icon image
-          width: 24,
-          height: 24,
-        ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _showCurrentLocationWeather,
+            backgroundColor: Colors.transparent,
+            child: Image.asset(
+              'assets/location.png',
+              width: 20,
+              height: 20,
+            ),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              _showSearchDialog(context);
+            },
+            backgroundColor: Colors.transparent,
+            child: Image.asset(
+              'assets/search.png',
+              width: 20,
+              height: 20,
+            ),
+          ),
+          const SizedBox(width: 16)
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      extendBody: true,
     );
   }
 
@@ -77,8 +97,14 @@ class _HomePageState extends State<HomePage> {
     }
     return SingleChildScrollView(
       child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height,
         child: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -86,19 +112,31 @@ class _HomePageState extends State<HomePage> {
           children: [
             _locationHeader(),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.08,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.08,
             ),
             _dateTimeInfo(),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.05,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.05,
             ),
             _weatherIcon(),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.02,
             ),
             _currentTemp(),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.02,
             ),
             _extraInfo(),
           ],
@@ -160,11 +198,15 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          height: MediaQuery.of(context).size.height * 0.20,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.20,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
-                  "http://openweathermap.org/img/wn/${_weather?.weatherIcon}@4x.png"),
+                  "http://openweathermap.org/img/wn/${_weather
+                      ?.weatherIcon}@4x.png"),
             ),
           ),
         ),
@@ -192,8 +234,14 @@ class _HomePageState extends State<HomePage> {
 
   Widget _extraInfo() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.15,
-      width: MediaQuery.of(context).size.width * 0.80,
+      height: MediaQuery
+          .of(context)
+          .size
+          .height * 0.15,
+      width: MediaQuery
+          .of(context)
+          .size
+          .width * 0.80,
       decoration: BoxDecoration(
         color: Colors.white24,
         borderRadius: BorderRadius.circular(
@@ -266,6 +314,21 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+
+          // See More Information
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NextFiveDaysWeather(cityName: _weather?.areaName ?? ""),
+                ),
+              );
+            },
+
+              child: Text("See More Information",
+              ),
+            ),
         ],
       ),
     );
@@ -306,5 +369,43 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-}
 
+  void _showCurrentLocationWeather() async {
+    try {
+      // Request location permission
+      LocationPermission permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        // Handle permission denied
+        print("Location permission denied");
+        // You might want to display a message to the user
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        String cityName = placemarks.first.locality ?? "";
+        _getWeather(cityName);
+      } else {
+        print("No placemarks found");
+        // Handle the case where no placemarks are found
+      }
+    } catch (e) {
+      print("Error getting current location: $e");
+      // Handle errors, for example, show a snackbar to the user
+    }
+  }
+
+
+
+
+
+}

@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   weather: ^3.1.1
   intl: ^0.18.1
+  geolocator: ^7.6.2
+  geocoding: ^2.0.2
 
 dev_dependencies:
   flutter_test:
